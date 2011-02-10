@@ -57,7 +57,7 @@ exports.request = function(originalRequest){
 		timedOut = true;
 		client.destroy();
 		deferred.reject(new Error("Timeout"));
-	}, 20000);
+	}, request.timeout || 20000);
 
 	var requestPath = request.pathname || request.pathInfo || "";
 	if (request.queryString) {
