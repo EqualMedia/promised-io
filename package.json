@@ -1,10 +1,18 @@
 {
   "name": "promised-io",
-  "version": "0.2.3",
+  "version": "0.3.0-pre",
+  "description": "Promise-based IO for Node.",
+  "keywords": ["promise", "io", "jsgi"],
   "author": {
     "name": "Kris Zyp"
   },
-  "description": "Promise-based IO",
+  "contributors": [
+    "Dean Landolt <dean@deanlandolt.com>",
+    "Nathan Stott <nathan.stott@whiteboard-it.com>",
+    "Mark Wubben <mark@novemberborn.net>",
+    "Vladimir Dronnikov <dronnikov@gmail.com>",
+    "Jed Schmidt"
+  ],
   "licenses": [
      {
          "type": "AFLv2.1",
@@ -17,25 +25,12 @@
   ],
   "repository": {
     "type":"git",
-    "url":"http://github.com/kriszyp/promised-io"
-  },
-  "contributors": [
-    "Dean Landolt <dean@deanlandolt.com",
-    "Nathan Stott <nathan.stott@whiteboard-it.com>",
-    "Mark Wubben <mark@novemberborn.net>",
-    "Vladimir Dronnikov <dronnikov@gmail.com>"
-  ],
-  "keywords": [
-    "promise",
-    "io"
-  ],
-  "mappings": {
-    "patr": "http://github.com/kriszyp/patr/zipball/v0.2.5"
+    "url":"http://github.com/EqualMedia/promised-io"
   },
   "directories": {
     "lib": "./lib"
   },
-  "dependencies":{
-    "patr": ">=0.2.5"
+  "engines": {
+    "node": ">=0.4"
   }
 }
