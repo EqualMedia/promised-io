@@ -8,7 +8,7 @@ var defer = require("../../../lib/promise").defer,
 	parse = require("url").parse;
 
 // configurable proxy server setting, defaults to http_proxy env var
-exports.proxyServer = require("../../../lib/process").env.http_proxy;
+exports.proxyServer = process.env.http_proxy;
 
 exports.request = function(originalRequest){
 	// make a shallow copy of original request object
