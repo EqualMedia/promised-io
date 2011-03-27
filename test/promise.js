@@ -145,6 +145,21 @@ exports["deferred with canceller"] = function(test){
 	deferred.promise.cancel();
 };
 
+exports["deferred with canceller, passing reason"] = function(test){
+	var cancelled = false;
+	var expected = {};
+	var deferred = promise.defer(function(reason){
+		cancelled = true;
+		test.strictEqual(reason, expected);
+	});
+	deferred.promise.then(shouldntYieldSuccess(test, true), function(error){
+		test.ok(cancelled);
+		test.ok(error instanceof promise.CancelError);
+		test.done();
+	});
+	deferred.promise.cancel(expected);
+};
+
 exports["deferred with canceller, returning custom error"] = function(test){
 	var cancelled = false;
 	var customError = {};
