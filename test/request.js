@@ -26,7 +26,7 @@ exports.http = require("nodeunit").testCase({
 		}.bind(this));
 		this._server.listen(function(){
 			var address = this._server.address();
-			this.host = address.address;
+			this.hostname = address.address;
 			this.port = address.port;
 			callback();
 		}.bind(this));
@@ -35,7 +35,7 @@ exports.http = require("nodeunit").testCase({
 	tearDown: function(callback){
 		this._server.on("close", function(){
 			delete this._server;
-			delete this.host;
+			delete this.hostname;
 			delete this.port;
 			delete this.handleRequest;
 			callback();
@@ -45,9 +45,9 @@ exports.http = require("nodeunit").testCase({
 	"missing options": function(test){
 		var tthrows = test["throws"].bind(test); // lint fail
 		tthrows(function(){ request(); });
-		tthrows(function(){ request({ method: "GET" }); }); // no scheme
-		tthrows(function(){ request({ method: "GET", scheme: "fake:" }); }); // invalid scheme
-		tthrows(function(){ request({ method: "GET", scheme: "http:" }); }); // no host
+		tthrows(function(){ request({ method: "GET" }); }); // no protocol
+		tthrows(function(){ request({ method: "GET", protocol: "fake:" }); }); // invalid protocol
+		tthrows(function(){ request({ method: "GET", protocol: "http:" }); }); // no hostname
 		test.done();
 	},
 	
@@ -60,10 +60,10 @@ exports.http = require("nodeunit").testCase({
 	
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port,
-			pathInfo: "/foo/bar"
+			pathname: "/foo/bar"
 		}).then(function(response){
 			test.equal(response.status, 200);
 			test.done();
@@ -79,7 +79,7 @@ exports.http = require("nodeunit").testCase({
 	
 		request({
 			method: "GET",
-			url: "http://" + this.host + ":" + this.port + "/foo/bar?baz=thud"
+			href: "http://" + this.hostname + ":" + this.port + "/foo/bar?baz=thud"
 		}).then(function(response){
 			test.equal(response.status, 200);
 			test.done();
@@ -94,8 +94,8 @@ exports.http = require("nodeunit").testCase({
 	
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port,
 			headers: { foo: "bar" }
 		}).then(function(response){
@@ -112,10 +112,10 @@ exports.http = require("nodeunit").testCase({
 		
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port,
-			queryString: "foo=bar"
+			query: "foo=bar"
 		}).then(function(response){
 			test.done();
 		}, shouldntYieldError(test, true));
@@ -130,10 +130,10 @@ exports.http = require("nodeunit").testCase({
 		
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port,
-			queryParams: ["foo", "bar", "baz", ""]
+			query: ["foo", "bar", "baz", ""]
 		}).then(function(response){
 			test.done();
 		}, shouldntYieldError(test, true));
@@ -146,8 +146,8 @@ exports.http = require("nodeunit").testCase({
 		
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port,
 			timeout: 1 // Timeout after 1 millisecond
 		}).then(shouldntYieldSuccess(test, true), function(error){
@@ -165,8 +165,8 @@ exports.http = require("nodeunit").testCase({
 		
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port
 		}).then(shouldntYieldSuccess(test, true), function(error){
 			test.ok(error instanceof promise.TimeoutError);
@@ -182,8 +182,8 @@ exports.http = require("nodeunit").testCase({
 		
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port,
 			timeout: 0
 		}).then(shouldntYieldSuccess(test), shouldntYieldError(test));
@@ -209,8 +209,8 @@ exports.http = require("nodeunit").testCase({
 		
 		var requestPromise = request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port
 		}).then(shouldntYieldSuccess(test), function(error){
 			test.ok(error instanceof promise.CancelError);
@@ -231,8 +231,8 @@ exports.http = require("nodeunit").testCase({
 		
 		request({
 			method: "POST",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port,
 			body: [sentBody]
 		}).then(null, shouldntYieldError(test));
@@ -279,8 +279,8 @@ exports.http = require("nodeunit").testCase({
 		
 		request({
 			method: "POST",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port,
 			body: lazyBody
 		}).then(null, shouldntYieldError(test));
@@ -330,8 +330,8 @@ exports.http = require("nodeunit").testCase({
 		
 		var requestPromise = request({
 			method: "POST",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port,
 			body: lazyBody
 		}).then(shouldntYieldSuccess(test), function(error){
@@ -356,8 +356,8 @@ exports.http = require("nodeunit").testCase({
 		
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port
 		}).then(function(response){
 			var receivedBody = "";
@@ -394,8 +394,8 @@ exports.http = require("nodeunit").testCase({
 		var requestCancelled = false;
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port
 		}).then(function(response){
 			var receivedBody = "";
@@ -432,8 +432,8 @@ exports.http = require("nodeunit").testCase({
 		var requestCancelled = false;
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port
 		}).then(function(response){
 			var receivedBody = "";
@@ -456,8 +456,8 @@ exports.http = require("nodeunit").testCase({
 		
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port
 		}).then(function(response){
 			var chunks = [];
@@ -480,8 +480,8 @@ exports.http = require("nodeunit").testCase({
 		
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port,
 			encoding: "utf8"
 		}).then(function(response){
@@ -505,8 +505,8 @@ exports.http = require("nodeunit").testCase({
 		
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port,
 			encoding: "base64"
 		}).then(function(response){
@@ -538,8 +538,8 @@ exports.http = require("nodeunit").testCase({
 		
 		request({
 			method: "POST",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port,
 			headers: { expect: "100-continue" },
 			body: [sentBody]
@@ -562,8 +562,8 @@ exports.http = require("nodeunit").testCase({
 		
 		request({
 			method: "POST",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port,
 			checkContinue: true,
 			body: [sentBody]
@@ -579,8 +579,8 @@ exports.http = require("nodeunit").testCase({
 		var triedSending = false;
 		request({
 			method: "POST",
-			scheme: "http:",
-			host: this.host,
+			protocol: "http:",
+			hostname: this.hostname,
 			port: this.port,
 			checkContinue: true,
 			body: new LazyArray({
@@ -606,22 +606,22 @@ exports.http = require("nodeunit").testCase({
 			}, 10);
 		};
 		
-		var agent = http.getAgent(this.host, this.port);
+		var agent = http.getAgent(this.hostname, this.port);
 		agent.maxSockets = 1;
 		
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
-			port: this.port
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
 			agent: agent
 		}).error(shouldntYieldError(test));
 		
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
-			port: this.port
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
 			agent: agent
 		}).then(function(){
 			test.done();
@@ -639,30 +639,30 @@ exports.http = require("nodeunit").testCase({
 			}, 10);
 		};
 		
-		var agent = http.getAgent(this.host, this.port);
+		var agent = http.getAgent(this.hostname, this.port);
 		agent.maxSockets = 2;
 		
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
-			port: this.port
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
 			agent: agent
 		}).error(shouldntYieldError(test));
 		
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
-			port: this.port
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
 			agent: agent
 		}).error(shouldntYieldError(test));
 		
 		request({
 			method: "GET",
-			scheme: "http:",
-			host: this.host,
-			port: this.port
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
 			agent: agent
 		}).then(function(){
 			test.done();
@@ -739,7 +739,7 @@ exports.https = require("nodeunit").testCase({
 		}.bind(this));
 		this._server.listen(function(){
 			var address = this._server.address();
-			this.host = address.address;
+			this.hostname = address.address;
 			this.port = address.port;
 			callback();
 		}.bind(this));
@@ -748,7 +748,7 @@ exports.https = require("nodeunit").testCase({
 	tearDown: function(callback){
 		this._server.on("close", function(){
 			delete this._server;
-			delete this.host;
+			delete this.hostname;
 			delete this.port;
 			delete this.handleRequest;
 			callback();
@@ -764,10 +764,10 @@ exports.https = require("nodeunit").testCase({
 	
 		request({
 			method: "GET",
-			scheme: "https:",
-			host: this.host,
+			protocol: "https:",
+			hostname: this.hostname,
 			port: this.port,
-			pathInfo: "/foo/bar"
+			pathname: "/foo/bar"
 		}).then(shouldntYieldSuccess(test, true), function(error){
 			test.ok(!receivedRequest);
 			test.ok(error instanceof request.SecureError);
@@ -784,10 +784,10 @@ exports.https = require("nodeunit").testCase({
 	
 		request({
 			method: "GET",
-			scheme: "https:",
-			host: this.host,
+			protocol: "https:",
+			hostname: this.hostname,
 			port: this.port,
-			pathInfo: "/foo/bar",
+			pathname: "/foo/bar",
 			InSeCUrE_useUnverifiedServer_iNsEcUrE: true
 		}).then(function(response){
 			test.equal(response.status, 200);
