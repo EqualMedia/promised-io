@@ -680,6 +680,45 @@ exports.http = require("nodeunit").testCase({
 		});
 	},
 	
+	"forEach over the body twice": function(test){
+		var sentBody = "hello world";
+		var sendNext;
+		this.handleRequest = function(req, res){
+			var chars = sentBody.split("");
+			sendNext = function(){
+				if(chars.length){
+					res.write(chars.shift());
+				}else{
+					res.end();
+				}
+			};
+			sendNext();
+		};
+		
+		request({
+			method: "GET",
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port
+		}).then(function(response){
+			var receivedBody = "", doubleReceivedBody = "";
+			response.body.forEach(function(chunk){
+				receivedBody += chunk;
+				if(receivedBody.length == 5){
+					response.body.forEach(function(chunk){
+						doubleReceivedBody += chunk;
+						sendNext();
+					});
+				}
+				sendNext();
+			}).then(function(){
+				test.equal(receivedBody, sentBody);
+				test.equal(doubleReceivedBody, sentBody);
+				test.done();
+			});
+		});
+	},
+	
 	"header {Expect: 100-continue} continue": function(test){
 		var sentBody = "hello world";
 		this._server.on("checkContinue", function(req, res){
