@@ -1,5 +1,7 @@
 var promise = require("../lib/promise");
 
+promise.detectUnhandled = 10;
+
 function shouldntYieldSuccess(test, done){
 	return function(){
 		test.ok(false, "Shouldn't yield success!");
@@ -299,13 +301,25 @@ exports["progress shortcut"] = function(test){
 	deferred.progress(expected);
 };
 
-exports["emit unhandled"] = function(test){
-	var expected = {};
-	promise.defer().reject(expected);
-	promise.once("error", function(error){
-		test.strictEqual(error, expected);
-		test.done();
-	});
+exports["detect unhandled"] = function(test){
+  test.testingUnhandled = true;
+  var expected = {};
+  promise.rejected(expected).then().then().then();
+  promise.once("error", function(error){
+    test.strictEqual(error, expected);
+    test.done();
+  });
+};
+
+exports["detect handled"] = function(test){
+  test.testingUnhandled = true;
+  var expected = {};
+  promise.rejected(expected).then().then().then(null, function(error){
+    setTimeout(test.done, promise.detectUnhandled);
+  });
+  promise.once("error", function(error){
+    test.ok(false, "detected unhandled anyway!");
+  });
 };
 
 exports["when for promise"] = function(test){
@@ -679,3 +693,23 @@ exports["convertAsync without declared callback, with error"] = function(test){
 		test.done();
 	});
 };
+
+Object.keys(exports).forEach(function(name){
+	var originalTest = exports[name];
+	exports[name] = function(test){
+		var signalDone = test.done;
+		var done = false;
+		test.done = function(){
+			done = true;
+		};
+		
+		promise.on("error", function(error){
+			!test.testingUnhandled && test.ok(false, "Unhandled promise error!");
+		});
+		originalTest(test);
+		setTimeout(function(){
+			promise.removeAllListeners("error");
+			done && signalDone();
+		}, promise.detectUnhandled);
+	};
+});
