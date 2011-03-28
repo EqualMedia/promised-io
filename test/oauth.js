@@ -1,5 +1,7 @@
 var oauth = require("../lib/oauth");
 
+require("../lib/promise").detectUnhandled = 10;
+
 exports.supportMethods = require("nodeunit").testCase({
 	setUp: function(ready){
 		this.client = new oauth.Client;

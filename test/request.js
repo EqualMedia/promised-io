@@ -5,6 +5,8 @@ var http = require("http"),
 		LazyArray = require("../lib/lazy-array"),
 		request = require("../lib/request");
 
+promise.detectUnhandled = 10;
+
 function shouldntYieldSuccess(test, done){
 	return function(){
 		test.ok(false, "Shouldn't yield success!");
