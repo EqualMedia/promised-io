@@ -268,6 +268,24 @@ exports.http = require("nodeunit").testCase({
 		}, shouldntYieldError(test, true));
 	},
 	
+	"passing query object, skip null": function(test){
+		this.handleRequest = function(req, res){
+			var parsed = parseUrl(req.url);
+			test.equal(parsed.query, "foo=bar&baz=");
+			res.end();
+		};
+		
+		request({
+			method: "GET",
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
+			query: { foo: "bar", baz: "", thud: null }
+		}).then(function(response){
+			test.done();
+		}, shouldntYieldError(test, true));
+	},
+	
 	"passing query object, throw for illegal value": function(test){
 		test["throws"](function(){
 			request({
@@ -276,6 +294,15 @@ exports.http = require("nodeunit").testCase({
 				hostname: this.hostname,
 				port: this.port,
 				query: { foo: "bar", baz: "", thud: {} }
+			});
+		});
+		test["throws"](function(){
+			request({
+				method: "GET",
+				protocol: "http:",
+				hostname: this.hostname,
+				port: this.port,
+				query: { foo: Infinity }
 			});
 		});
 		test.done();
@@ -292,6 +319,61 @@ exports.http = require("nodeunit").testCase({
 			method: "GET",
 			href: "http://" + this.hostname + ":" + this.port + "/foo/bar?baz=thud",
 			query: "foo=bar"
+		}).then(function(response){
+			test.done();
+		}, shouldntYieldError(test, true));
+	},
+	
+	"properly escape query string": function(test){
+		this.handleRequest = function(req, res){
+			var parsed = parseUrl(req.url);
+			test.equal(parsed.query, "foo%20bar=baz");
+			res.end();
+		};
+		
+		request({
+			method: "GET",
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
+			query: ["foo bar", "baz"]
+		}).then(function(response){
+			test.done();
+		}, shouldntYieldError(test, true));
+	},
+	
+	"allow arrays in query object": function(test){
+		this.handleRequest = function(req, res){
+			var parsed = parseUrl(req.url);
+			test.equal(parsed.query, "foo=bar&foo=baz");
+			res.end();
+		};
+		
+		request({
+			method: "GET",
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
+			query: { foo: ["bar", "baz"] }
+		}).then(function(response){
+			test.done();
+		}, shouldntYieldError(test, true));
+	},
+	
+	"skip query encoding": function(test){
+		this.handleRequest = function(req, res){
+			var parsed = parseUrl(req.url);
+			test.equal(parsed.query, "foo=%20");
+			res.end();
+		};
+		
+		request({
+			method: "GET",
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
+			query: { foo: "%20" },
+			queryIsEncoded: true
 		}).then(function(response){
 			test.done();
 		}, shouldntYieldError(test, true));
