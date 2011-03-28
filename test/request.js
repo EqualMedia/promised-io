@@ -972,6 +972,38 @@ exports.https = require("nodeunit").testCase({
 		});
 	},
 	
+	"verification failure, two requests in a row": function(test){
+		var receivedRequest = false;
+		this.handleRequest = function(req, res){
+			receivedRequest = true;
+			res.end();
+		};
+	
+		request({
+			method: "GET",
+			protocol: "https:",
+			hostname: this.hostname,
+			port: this.port,
+			pathname: "/foo/bar"
+		}).then(shouldntYieldSuccess(test, true), function(error){
+			test.ok(!receivedRequest);
+			test.ok(error instanceof request.SecureError);
+			// Test that somehow the connection doesn't stay open for the next request, after which there might
+			// not be any security verification.
+			request({
+				method: "GET",
+				protocol: "https:",
+				hostname: this.hostname,
+				port: this.port,
+				pathname: "/foo/bar"
+			}).then(shouldntYieldSuccess(test, true), function(error){
+				test.ok(!receivedRequest);
+				test.ok(error instanceof request.SecureError);
+				test.done();
+			});
+		}.bind(this));
+	},
+	
 	"insecure, ignore verification failure": function(test){
 		this.handleRequest = function(req, res){
 			test.equal(req.url, "/foo/bar");
