@@ -448,7 +448,7 @@ exports["all, rejected"] = function(test){
 	promise.all(promise.rejected(expected), promise.rejected(expected)).then(shouldntYieldSuccess(test, true), function(error){
 		test.strictEqual(error, expected);
 		test.done();
-	}).cancel();
+	});
 };
 
 exports["all, cancelled"] = function(test){
