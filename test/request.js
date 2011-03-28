@@ -70,7 +70,7 @@ exports.http = require("nodeunit").testCase({
 		}, shouldntYieldError(test, true));
 	},
 	
-	"url parsing": function(test){
+	"href parsing": function(test){
 		this.handleRequest = function(req, res){
 			test.equal(req.url, "/foo/bar?baz=thud");
 			res.writeHead(200);
@@ -121,7 +121,7 @@ exports.http = require("nodeunit").testCase({
 		}, shouldntYieldError(test, true));
 	},
 	
-	"passing query params": function(test){
+	"passing query array": function(test){
 		this.handleRequest = function(req, res){
 			var parsed = parseUrl(req.url);
 			test.equal(parsed.query, "foo=bar&baz=");
@@ -134,6 +134,102 @@ exports.http = require("nodeunit").testCase({
 			hostname: this.hostname,
 			port: this.port,
 			query: ["foo", "bar", "baz", ""]
+		}).then(function(response){
+			test.done();
+		}, shouldntYieldError(test, true));
+	},
+	
+	"passing query array, skip undefined": function(test){
+		this.handleRequest = function(req, res){
+			var parsed = parseUrl(req.url);
+			test.equal(parsed.query, "foo=bar&baz=");
+			res.end();
+		};
+		
+		request({
+			method: "GET",
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
+			query: ["foo", "bar", "baz", "", "thud", undefined]
+		}).then(function(response){
+			test.done();
+		}, shouldntYieldError(test, true));
+	},
+	
+	"passing query array, throw for illegal value": function(test){
+		test["throws"](function(){
+			request({
+				method: "GET",
+				protocol: "http:",
+				hostname: this.hostname,
+				port: this.port,
+				query: ["foo", "bar", "baz", "", "thud", {}]
+			});
+		});
+		test.done();
+	},
+	
+	"passing query object": function(test){
+		this.handleRequest = function(req, res){
+			var parsed = parseUrl(req.url);
+			test.equal(parsed.query, "foo=bar&baz=");
+			res.end();
+		};
+		
+		request({
+			method: "GET",
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
+			query: { foo: "bar", baz: "" }
+		}).then(function(response){
+			test.done();
+		}, shouldntYieldError(test, true));
+	},
+	
+	"passing query object, skip undefined": function(test){
+		this.handleRequest = function(req, res){
+			var parsed = parseUrl(req.url);
+			test.equal(parsed.query, "foo=bar&baz=");
+			res.end();
+		};
+		
+		request({
+			method: "GET",
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
+			query: { foo: "bar", baz: "", thud: undefined }
+		}).then(function(response){
+			test.done();
+		}, shouldntYieldError(test, true));
+	},
+	
+	"passing query object, throw for illegal value": function(test){
+		test["throws"](function(){
+			request({
+				method: "GET",
+				protocol: "http:",
+				hostname: this.hostname,
+				port: this.port,
+				query: { foo: "bar", baz: "", thud: {} }
+			});
+		});
+		test.done();
+	},
+	
+	"passing query overrides href query": function(test){
+		this.handleRequest = function(req, res){
+			var parsed = parseUrl(req.url);
+			test.equal(parsed.query, "foo=bar");
+			res.end();
+		};
+		
+		request({
+			method: "GET",
+			href: "http://" + this.hostname + ":" + this.port + "/foo/bar?baz=thud",
+			query: "foo=bar"
 		}).then(function(response){
 			test.done();
 		}, shouldntYieldError(test, true));
