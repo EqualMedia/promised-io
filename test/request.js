@@ -103,6 +103,68 @@ exports.http = require("nodeunit").testCase({
 		}, shouldntYieldError(test, true));
 	},
 	
+	"auto-set host for 'localhost'": function(test){
+		this.handleRequest = function(req, res){
+			test.equal(req.headers.host, "localhost:" + this.port); // Since we're on a non-standard port, the port gets added
+			test.done();
+			res.end();
+		};
+		
+		request({
+			method: "GET",
+			protocol: "http:",
+			hostname: "localhost", // Assumed to exist and point to the current machine
+			port: this.port
+		}).then(null, shouldntYieldError(test, true));
+	},
+	
+	"regular host passing": function(test){
+		this.handleRequest = function(req, res){
+			test.equal(req.headers.host, "promised-io");
+			test.done();
+			res.end();
+		};
+		
+		request({
+			method: "GET",
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
+			headers: { host: "promised-io" }
+		}).then(null, shouldntYieldError(test, true));
+	},
+	
+	"regular host passing, mixed header case": function(test){
+		this.handleRequest = function(req, res){
+			test.equal(req.headers.host, "promised-io");
+			test.done();
+			res.end();
+		};
+		
+		request({
+			method: "GET",
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
+			headers: { HoSt: "promised-io" }
+		}).then(null, shouldntYieldError(test, true));
+	},
+	
+	"empty host, hostname is an IP address": function(test){
+		this.handleRequest = function(req, res){
+			test.equal(req.headers.host, "");
+			test.done();
+			res.end();
+		};
+		
+		request({
+			method: "GET",
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port
+		}).then(null, shouldntYieldError(test, true));
+	},
+	
 	"passing query string": function(test){
 		this.handleRequest = function(req, res){
 			var parsed = parseUrl(req.url);
