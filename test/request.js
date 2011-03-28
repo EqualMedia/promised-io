@@ -157,8 +157,8 @@ exports.http = require("nodeunit").testCase({
 	},
 	
 	"default timeout": function(test){
-		var originalTimeout = request.defaultTimeout;
-		request.defaultTimeout = 1;
+		var originalTimeout = request.requestTimeout;
+		request.requestTimeout = 1;
 		this.handleRequest = function(req, res){
 			// Don't respond
 		};
@@ -171,7 +171,7 @@ exports.http = require("nodeunit").testCase({
 		}).then(shouldntYieldSuccess(test, true), function(error){
 			test.ok(error instanceof promise.TimeoutError);
 			test.done();
-			request.defaultTimeout = originalTimeout;
+			request.requestTimeout = originalTimeout;
 		});
 	},
 	
@@ -614,6 +614,7 @@ exports.http = require("nodeunit").testCase({
 			scheme: "http:",
 			host: this.host,
 			port: this.port
+			agent: agent
 		}).error(shouldntYieldError(test));
 		
 		request({
@@ -621,6 +622,7 @@ exports.http = require("nodeunit").testCase({
 			scheme: "http:",
 			host: this.host,
 			port: this.port
+			agent: agent
 		}).then(function(){
 			test.done();
 		}, shouldntYieldError(test, true));
@@ -645,6 +647,7 @@ exports.http = require("nodeunit").testCase({
 			scheme: "http:",
 			host: this.host,
 			port: this.port
+			agent: agent
 		}).error(shouldntYieldError(test));
 		
 		request({
@@ -652,6 +655,7 @@ exports.http = require("nodeunit").testCase({
 			scheme: "http:",
 			host: this.host,
 			port: this.port
+			agent: agent
 		}).error(shouldntYieldError(test));
 		
 		request({
@@ -659,6 +663,7 @@ exports.http = require("nodeunit").testCase({
 			scheme: "http:",
 			host: this.host,
 			port: this.port
+			agent: agent
 		}).then(function(){
 			test.done();
 		}, shouldntYieldError(test, true));
