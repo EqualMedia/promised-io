@@ -480,6 +480,69 @@ exports.http = require("nodeunit").testCase({
 		}).then(null, shouldntYieldError(test));
 	},
 	
+	"don't send body for GET": function(test){
+		var sentBody = "hello world";
+		var receivedBody = "";
+		this.handleRequest = function(req, res){
+			req.on("data", function(chunk){ receivedBody += chunk; });
+			req.on("end", function(){
+				res.end();
+				test.equal(receivedBody, "");
+				test.done();
+			});
+		};
+		
+		request({
+			method: "GET",
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
+			body: [sentBody]
+		}).then(null, shouldntYieldError(test));
+	},
+	
+	"don't send body for DELETE": function(test){
+		var sentBody = "hello world";
+		var receivedBody = "";
+		this.handleRequest = function(req, res){
+			req.on("data", function(chunk){ receivedBody += chunk; });
+			req.on("end", function(){
+				res.end();
+				test.equal(receivedBody, "");
+				test.done();
+			});
+		};
+		
+		request({
+			method: "DELETE",
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
+			body: [sentBody]
+		}).then(null, shouldntYieldError(test));
+	},
+	
+	"don't send body for HEAD": function(test){
+		var sentBody = "hello world";
+		var receivedBody = "";
+		this.handleRequest = function(req, res){
+			req.on("data", function(chunk){ receivedBody += chunk; });
+			req.on("end", function(){
+				res.end();
+				test.equal(receivedBody, "");
+				test.done();
+			});
+		};
+		
+		request({
+			method: "HEAD",
+			protocol: "http:",
+			hostname: this.hostname,
+			port: this.port,
+			body: [sentBody]
+		}).then(null, shouldntYieldError(test));
+	},
+	
 	"post lazy body": function(test){
 		var sentBody = "hello world";
 		var sendNext;
