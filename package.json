@@ -28,5 +28,13 @@
   },
   "engines": {
     "node": ">=0.4"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "jsdoc": "https://github.com/micmath/jsdoc/tarball/79964a87278636484ef636499430b01c04a1f02a",
+    "nodeunit": ">=0.5.1"
+  },
+  "scripts": {
+    "test": "./bin/test"
   }
 }
