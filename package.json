@@ -31,10 +31,11 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "jsdoc": "https://github.com/micmath/jsdoc/tarball/79964a87278636484ef636499430b01c04a1f02a",
+    "jsdoc": "https://github.com/novemberborn/jsdoc/tarball/53dbc2df1d655a756ff646d34571dcb7c94dc943",
     "nodeunit": ">=0.5.1"
   },
   "scripts": {
-    "test": "./bin/test"
+    "test": "./bin/test",
+    "jsdoc": "./bin/jsdoc"
   }
 }

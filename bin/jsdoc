@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if [ ! -f "./node_modules/jsdoc/jsdoc.jar" ]
+then
+	echo "JSDoc has not yet been compiled. Compiling now."
+	cd ./node_modules/jsdoc
+	ant
+	cd ../..
+fi
+
+echo "Building documentation"
+java -jar ./node_modules/jsdoc/jsdoc.jar -d ./doc/ .
+echo "Output to doc/"
