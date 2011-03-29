@@ -1,6 +1,6 @@
 /**
  * Implements an OAuth client around the request module.
- * @module
+ * @module oauth
  */
 
 var parseUrl = require("url").parse,

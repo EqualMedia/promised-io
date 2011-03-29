@@ -1,6 +1,6 @@
 /**
  * Extends the <code>oauth</code> module to add an xAuth> implementation.
- * @module
+ * @module oauth+xauth
  */
 
 var oauth = require("./oauth");

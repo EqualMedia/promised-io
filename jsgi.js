@@ -1,7 +1,7 @@
 /**
  * Implement a JSGI server according to <a href="http://wiki.commonjs.org/wiki/JSGI/Level0/A/Draft2">http://wiki.commonjs.org/wiki/JSGI/Level0/A/Draft2</a>.
  * Supports both HTTP and HTTPS servers.
- * @module
+ * @module jsgi
  */
 
 var parseUrl = require("url").parse,

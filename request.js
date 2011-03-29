@@ -1,7 +1,7 @@
 /**
  * Promise-based HTTP requests, using Node/DOM standard properties. Response object follows JSGI.
  * Directly exports the request method but also makes it available as a property.
- * @module
+ * @module request
  */
 
 var http = require("http"),

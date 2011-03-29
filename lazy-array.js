@@ -1,6 +1,6 @@
 /**
- * @module
- * @description Directly exports the LazyArray class, but also makes it available via the <code>LazyArray</code> property.
+ * Directly exports the LazyArray class, but also makes it available via the <code>LazyArray</code> property.
+ * @module lazy-array
  */
 
 var when = require("./promise").when;
