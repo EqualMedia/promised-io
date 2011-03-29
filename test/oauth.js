@@ -1,6 +1,6 @@
-var oauth = require("../lib/oauth");
+var oauth = require("../oauth");
 
-require("../lib/promise").detectUnhandled = 10;
+require("../promise").detectUnhandled = 10;
 
 exports.supportMethods = require("nodeunit").testCase({
 	setUp: function(ready){

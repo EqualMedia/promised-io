@@ -26,9 +26,6 @@
     "type":"git",
     "url":"http://github.com/EqualMedia/promised-io"
   },
-  "directories": {
-    "lib": "./lib"
-  },
   "engines": {
     "node": ">=0.4"
   }

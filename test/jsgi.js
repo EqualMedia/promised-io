@@ -1,7 +1,7 @@
-var request = require("../lib/request"),
-		promise = require("../lib/promise"),
-		jsgi = require("../lib/jsgi"),
-		LazyArray = require("../lib/lazy-array");
+var request = require("../request"),
+		promise = require("../promise"),
+		jsgi = require("../jsgi"),
+		LazyArray = require("../lazy-array");
 
 promise.detectUnhandled = 10;
 

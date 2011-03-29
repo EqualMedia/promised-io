@@ -1,4 +1,4 @@
-var promise = require("../lib/promise");
+var promise = require("../promise");
 
 promise.detectUnhandled = 10;
 

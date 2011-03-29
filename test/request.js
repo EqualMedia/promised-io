@@ -1,9 +1,9 @@
 var http = require("http"),
 		https = require("https"),
 		parseUrl = require("url").parse,
-		promise = require("../lib/promise"),
-		LazyArray = require("../lib/lazy-array"),
-		request = require("../lib/request");
+		promise = require("../promise"),
+		LazyArray = require("../lazy-array"),
+		request = require("../request");
 
 promise.detectUnhandled = 10;
 
