@@ -152,9 +152,9 @@ exports.http = require("nodeunit").testCase({
 		}).then(null, shouldntYieldError(test, true));
 	},
 	
-	"empty host, hostname is an IP address": function(test){
+	"default host to hostname (and non-standard port)": function(test){
 		this.handleRequest = function(req, res){
-			test.equal(req.headers.host, "");
+			test.equal(req.headers.host, this.hostname + ":" + this.port);
 			test.done();
 			res.end();
 		};
