@@ -153,8 +153,8 @@ exports.Client.prototype.request = function(options){
 	
 	// If there are no parameters in the body, and we're doing a POST or PUT, we'll put the query parameters into the body
 	// instead.
-	if(!parametersInBody && options.query.length && !options.headers["content-type"]){
-		options.body = request.toQueryString(options.query, queryIsEncoded);
+	if(!parametersInBody && (options.method === "POST" || options.method === "PUT") && options.query.length && !options.headers["content-type"]){
+		options.body = request._queryArrayToString(options.query, queryIsEncoded);
 		delete options.query;
 		options.headers["content-type"] = "application/x-www-form-urlencoded";
 	}
