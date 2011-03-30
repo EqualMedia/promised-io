@@ -115,6 +115,10 @@ function _normalizeOptions(options){
 		}
 	}
 	
+	if(!normalized.query){
+		normalized.query = "";
+	}
+	
 	return normalized;
 };
 
