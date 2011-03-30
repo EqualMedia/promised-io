@@ -393,8 +393,14 @@ function rejected(error){
  * @extends Error
  */
 exports.TimeoutError = TimeoutError;
-function TimeoutError(){
-	Error.apply(this, arguments);
+function TimeoutError(message){
+	var tmp = Error.apply(this, arguments);
+	tmp.name = "TimeoutError";
+	tmp.message = message || "The deferred timed out because it took too long to resolve.";
+	Object.keys(tmp).reduce(function(error, key){
+		error[key] = tmp[key];
+		return error;
+	}, this);
 }
 inherits(TimeoutError, Error);
 
@@ -405,8 +411,14 @@ inherits(TimeoutError, Error);
  * @extends Error
  */
 exports.CancelError = CancelError;
-function CancelError(){
-	Error.apply(this, arguments);
+function CancelError(message){
+	var tmp = Error.apply(this, arguments);
+	tmp.name = "CancelError";
+	tmp.message = message || "The deferred was cancelled.";
+	Object.keys(tmp).reduce(function(error, key){
+		error[key] = tmp[key];
+		return error;
+	}, this);
 }
 inherits(CancelError, Error);
 

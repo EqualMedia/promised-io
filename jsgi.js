@@ -41,8 +41,14 @@ exports.createServer = function(app, secureOptions){
  * @extends Error
  */
 exports.ClosedError = ClosedError;
-function ClosedError(){
-	Error.apply(this, arguments);
+function ClosedError(message){
+	var tmp = Error.apply(this, arguments);
+	tmp.name = "ClosedError";
+	tmp.message = message || "The inbound connection was closed.";
+	Object.keys(tmp).reduce(function(error, key){
+		error[key] = tmp[key];
+		return error;
+	}, this);
 };
 require("util").inherits(ClosedError, Error);
 
