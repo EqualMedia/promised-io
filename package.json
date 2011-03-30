@@ -31,7 +31,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "jsdoc": "https://github.com/novemberborn/jsdoc/tarball/53dbc2df1d655a756ff646d34571dcb7c94dc943",
+    "jsdoc": "https://github.com/micmath/jsdoc/tarball/813fd8ad633abcf31f42cceec6c13b52339f3fde",
     "nodeunit": ">=0.5.1"
   },
   "scripts": {
