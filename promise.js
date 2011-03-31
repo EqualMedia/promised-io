@@ -38,9 +38,11 @@ function scheduleUnhandledTest(id, error){
 		var dependencies = UnhandledDeferreds[id] || [];
 		// Keep adding to the dependencies.
 		for(var i = 0; i < dependencies.length; i++){
-			var nested = UnhandledDeferreds[dependencies[i]];
-			if(nested){
-				dependencies.push.apply(dependencies, nested);
+			if(dependencies[i] !== id){
+				var nested = UnhandledDeferreds[dependencies[i]];
+				if(nested){
+					dependencies.push.apply(dependencies, nested);
+				}
 			}
 		}
 		// If there are no dependencies, or one of the dependencies has been handled, we won't need to emit an error
@@ -291,6 +293,10 @@ exports.Deferred = function(canceller){
 		// Note: `waiting` can be appended to whilst executing notifying listeners.
 		for(var i = 0; i < waiting.length; i++){
 			notify(waiting[i]);	
+		}
+		// If we have no listeners, and are detecting unhandled errors, add deferred to its own dependencies
+		if(isError && exports.detectUnhandled && !waiting.length){
+			UnhandledDeferreds[id] = [id];
 		}
 		// We're no longer processing listeners, clear the list so they can be garbage collected.
 		waiting = null;
