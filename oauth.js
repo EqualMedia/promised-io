@@ -10,7 +10,7 @@ var parseUrl = require("url").parse,
 		request = require("./request");
 
 function encodeRfc3986(str){
-	return !str ? "" : encodeURIComponent(str)
+	return request._escapeQueryValue(str)
 			.replace(/\!/g, "%21")
 			.replace(/\'/g, "%27")
 			.replace(/\(/g, "%28")

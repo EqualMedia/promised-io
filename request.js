@@ -47,7 +47,7 @@ var DefaultPorts = {
 	"https:": 443
 };
 
-function escapeQueryValue(v){
+exports._escapeQueryValue = function(v){
 	switch(typeof v){
 		case "string":
 			return encodeURIComponent(v);
@@ -58,7 +58,7 @@ function escapeQueryValue(v){
 		default:
 			return "";
 	}
-}
+};
 
 exports._normalizeOptions = _normalizeOptions;
 function _normalizeOptions(options){
@@ -186,7 +186,7 @@ function _queryArrayToString(queryArr, queryIsEncoded){
 		if(queryIsEncoded){
 			str += queryArr[i] + "=" + queryArr[i + 1];
 		}else{
-			str += escapeQueryValue(queryArr[i]) + "=" + escapeQueryValue(queryArr[i + 1]);
+			str += exports._escapeQueryValue(queryArr[i]) + "=" + exports._escapeQueryValue(queryArr[i + 1]);
 		}
 	}
 	return str;
