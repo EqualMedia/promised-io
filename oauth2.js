@@ -98,11 +98,15 @@ exports.Client.prototype.request = function(options){
  * @param {string} redirectUri The URL used to obtain the authorization code
  * @returns A promise for the credentials. If the server does not return with a 200 response, the promise is rejected with the server response.
  */
-exports.Client.prototype.obtainTokenCredentials = function(code, redirectUri){
+exports.Client.prototype.obtainTokenCredentials = function(code, redirectUri, grantType){
+	var query = ["client_id", this.identifier, "client_secret", this.secret, "code", code, "redirect_uri", redirectUri];
+	if(grantType){
+		query.push("grant_type", grantType);
+	}
 	return this.request({
 		method: "POST",
 		href: this.accessTokenUrl,
-		query: ["client_id", this.identifier, "client_secret", this.secret, "code", code, "redirect_uri", redirectUri]
+		query: query
 	}).then(parseResponse);
 };
 
