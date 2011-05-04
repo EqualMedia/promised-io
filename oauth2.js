@@ -86,6 +86,7 @@ exports.Client.prototype.request = function(options){
 		options.body = [request._queryArrayToString(options.query, queryIsEncoded)];
 		delete options.query;
 		options.headers["content-type"] = "application/x-www-form-urlencoded";
+		options.headers["content-length"] = options.body[0].length;
 	}
 	
 	return request(options);
