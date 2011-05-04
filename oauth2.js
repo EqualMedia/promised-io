@@ -29,14 +29,16 @@ function parseResponse(response){
 * @param {string} secret Client shared-secret
 * @param {string} authorizationUrl URL (excluding query string) from which an authorization code can be retrieved
 * @param {string} accessTokenUrl URL used to request token credentials
+* @param {string} accessTokenParam Parameter name for including the access token in the request. Defaults to 'oauth_token'.
 * @param {object} headers Default request headers
 */
 exports.Client = Client;
-function Client(identifier, secret, authorizationUrl, accessTokenUrl, headers){
+function Client(identifier, secret, authorizationUrl, accessTokenUrl, accessTokenParam, headers){
 	this.identifier = identifier;
 	this.secret = secret;
 	this.authorizationUrl = authorizationUrl;
 	this.accessTokenUrl = accessTokenUrl;
+	this.accessTokenParam = accessTokenParam || "oauth_token";
 	this.headers = headers || {};
 }
 
@@ -48,6 +50,7 @@ function Client(identifier, secret, authorizationUrl, accessTokenUrl, headers){
 exports.Client.prototype.bind = function(accessToken){
 	var bound = {
 		accessToken: accessToken,
+		accessTokenParam: this.accessTokenParam,
 		headers: this.headers
 	};
 	bound.request = this.request;
@@ -74,7 +77,7 @@ exports.Client.prototype.request = function(options){
 	options.query = request._queryToArray(options.query);
 	// Try signing the request by adding the access token
 	if(this.accessToken){
-		options.query.push("access_token", this.accessToken);
+		options.query.push(this.accessTokenParam, this.accessToken);
 	}
 	
 	// If there are no parameters in the body, and we're doing a POST or PUT, we'll put the query parameters into the body
