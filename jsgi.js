@@ -86,6 +86,54 @@ function Listener(app, emitError){
 	};
 }
 
+/**
+ * Creates a Node-compatible response object that can be used by other Node modules
+ * to create a response. Returns a Deferred-like object with <code>promise</code> and
+ * <code>then()</code> properties.
+ * @class
+ */
+exports.FauxResponse = FauxResponse;
+function FauxResponse(){
+	var deferred = defer();
+	this.promise = deferred.promise;
+	this.then = deferred.promise.then;
+	
+	var bodyCancelled = false;
+	var bodyDeferred = defer(function(){ bodyCancelled = true; });
+	var bodyBuffer = [];
+	var dataCallbacks = [bodyBuffer.push.bind(bodyBuffer)];
+	var sendData = function(chunk){
+		if(!bodyCancelled){
+			for(var i = 0, l = dataCallbacks.length; !bodyCancelled && i < l; i++){
+				dataCallbacks[i](chunk);
+			}
+		}
+	};
+	
+	this.writeHead = function(status, headers){
+		deferred.resolve({
+			status: status,
+			headers: headers,
+			body: new LazyArray({
+				some: function(callback){
+					bodyBuffer.forEach(callback);
+					dataCallbacks.push(callback);
+					return bodyDeferred.promise;
+				}
+			})
+		});
+	};
+	
+	this.write = function(data){
+		data && sendData(data);
+	};
+	
+	this.end = function(data){
+		data && sendData(data);
+		bodyDeferred.resolve();
+	};
+}
+
 var DefaultPorts = {
 	"http:": 80,
 	"https:": 443
