@@ -143,7 +143,7 @@ function Request(originalRequest, writeContinue){
 	var expectContinue = originalRequest.headers.expect === "100-continue";
 	
 	var parsed = parseUrl(originalRequest.url);
-	var host = originalRequest.headers.host;
+	var host = originalRequest.headers.host || "";
 	var parts = host.split(":");
 	var hostname = parts[0];
 	var port = parts[1];
