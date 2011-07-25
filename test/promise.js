@@ -195,6 +195,22 @@ exports["cancel from derived promise"] = function(test){
 	}).cancel();
 };
 
+exports["cancel derived promise which is normally resolved when a returned promise is resolved"] = function(test){
+	var first = promise.defer(function(){});
+	var second = promise.defer(function(){});
+	var third = first.then(function(){
+		return second.promise;
+	}).fail(function(){});
+	
+	// Resolve the first promise, this causes third to wait on second
+	first.resolve();
+	// Then cancel third, which resolves it
+	third.cancel();
+	// This tries to once more resolve third, which fails. It won't throw in this callstack however.
+	second.resolve();
+	test.done();
+};
+
 exports["resolver callback"] = function(test){
 	var expected = {};
 	var deferred = promise.defer();
@@ -704,7 +720,7 @@ Object.keys(exports).forEach(function(name){
 		};
 		
 		promise.on("error", function(error){
-			!test.testingUnhandled && test.ok(false, "Unhandled promise error!");
+			!test.testingUnhandled && test.ok(false, error.stack);
 		});
 		originalTest(test);
 		setTimeout(function(){

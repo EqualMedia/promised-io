@@ -30,6 +30,7 @@ exports.detectUnhandled = 0;
 // When a deferred is handled, it'll remove itself. Thus, we can calculate the dependency tree
 // all the way down. If there are no deferreds in the tree then the error has been handled.
 var UnhandledDeferreds = {};
+UnhandledDeferreds.Skip = {};
 // Count deferreds to generate unique IDs.
 var DeferredCount = 0;
 
@@ -219,12 +220,28 @@ exports.Deferred = function(canceller){
 	 * @return A new promise
 	 */
 	this.then = function(resolvedCallback, rejectCallback, progressCallback){
-		var returnDeferred = new Deferred(promise.cancel);
+		var cancelled;
+		var returnDeferred = new Deferred(function(reason){
+			cancelled = true;
+			if(exports.detectUnhandled && !promise.cancel){
+				UnhandledDeferreds.Skip[returnDeferred["-id-"]] = true;
+				return reason;
+			}
+			return promise.cancel && promise.cancel(reason);
+		});
 		var listener = {
 			resolved: resolvedCallback,
 			error: rejectCallback,
 			progress: progressCallback,
-			deferred: returnDeferred
+			deferred: returnDeferred,
+			resolveAsync: function(value){
+				!cancelled && returnDeferred.resolve(value);
+				return true;
+			},
+			rejectAsync: function(error){
+				!cancelled && returnDeferred.reject(error);
+				return true;
+			}
 		};
 		// Enqueue listener if we're fulfilled but still calling our own callbacks, else call immediately.
 		// This behavior is undefined in the specification but is the behavior from Dojo 1.5 and 1.6.
@@ -295,7 +312,7 @@ exports.Deferred = function(canceller){
 			notify(waiting[i]);	
 		}
 		// If we have no listeners, and are detecting unhandled errors, add deferred to its own dependencies
-		if(isError && exports.detectUnhandled && !waiting.length){
+		if(isError && exports.detectUnhandled && !waiting.length && !UnhandledDeferreds.Skip[id]){
 			UnhandledDeferreds[id] = [id];
 		}
 		// We're no longer processing listeners, clear the list so they can be garbage collected.
@@ -314,7 +331,7 @@ exports.Deferred = function(canceller){
 			try{
 				var newResult = func(result);
 				if(newResult && typeof newResult.then === "function"){
-					newResult.then(listener.deferred.resolve, listener.deferred.reject);
+					newResult.then(listener.resolveAsync, listener.rejectAsync);
 					return;
 				}
 				listener.deferred.resolve(newResult);
