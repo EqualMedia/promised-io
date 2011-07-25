@@ -289,7 +289,7 @@ module.exports = require("nodeunit").testCase({
 			return deferred.promise;
 		};
 		
-		var requestPromise = request({ protocol: "http:", hostname: this.hostname, port: this.port });
+		var requestPromise = request({ protocol: "http:", hostname: this.hostname, port: this.port }).fail(function(){});
 		setTimeout(function(){
 			test.ok(cancelled);
 			test.done();
