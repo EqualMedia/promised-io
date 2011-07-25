@@ -94,16 +94,23 @@ function Listener(app, emitError){
  */
 exports.FauxResponse = FauxResponse;
 function FauxResponse(){
-	var deferred = defer();
+	var cancelled = false;
+	var deferred = defer(function(reason){
+		cancelled = true;
+		return reason;
+	});
 	this.promise = deferred.promise;
 	this.then = deferred.promise.then;
 	
 	var bodyCancelled = false;
-	var bodyDeferred = defer(function(){ bodyCancelled = true; });
+	var bodyDeferred = defer(function(reason){
+		bodyCancelled = true;
+		return reason;
+	});
 	var bodyBuffer = [];
 	var dataCallbacks = [bodyBuffer.push.bind(bodyBuffer)];
 	var sendData = function(chunk){
-		if(!bodyCancelled){
+		if(!cancelled && !bodyCancelled){
 			for(var i = 0, l = dataCallbacks.length; !bodyCancelled && i < l; i++){
 				dataCallbacks[i](chunk);
 			}
@@ -111,7 +118,7 @@ function FauxResponse(){
 	};
 	
 	this.writeHead = function(status, headers){
-		deferred.resolve({
+		!cancelled && deferred.resolve({
 			status: status,
 			headers: headers,
 			body: new LazyArray({
@@ -130,9 +137,9 @@ function FauxResponse(){
 	
 	this.end = function(data){
 		data && sendData(data);
-		bodyDeferred.resolve();
+		!cancelled && !bodyCancelled && bodyDeferred.resolve();
 	};
-}
+};
 
 var DefaultPorts = {
 	"http:": 80,
