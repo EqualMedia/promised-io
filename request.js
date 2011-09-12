@@ -205,8 +205,9 @@ function request(options){
 	if(options.query){
 		options.path += "?" + options.query;
 	}
+	var req;
 	if(options.protocol === "http:"){
-		var req = http.request({
+		req = http.request({
 			method: options.method,
 			host: options.hostname, port: options.port,
 			path: options.path,
@@ -214,7 +215,7 @@ function request(options){
 			agent: options.agent
 		});
 	}else{
-		var req = https.request({
+		req = https.request({
 			method: options.method,
 			host: options.hostname, port: options.port,
 			path: options.path,
@@ -222,19 +223,34 @@ function request(options){
 			agent: options.agent,
 			key: options.key, cert: options.cert, ca: options.ca
 		});
-		req.socket.pair.on("secure", function(){
-			if(!req.socket.authorized && options.InSeCUrE_useUnverifiedServer_iNsEcUrE !== true){
-				deferred.reject(new SecureError(req.socket.authorizationError));
-				closed = true;
-				req.abort();
-			}
-		});
+		// Socket may not be immediately available
+		if(req.socket){
+			checkSecure(req.socket);
+		}else{
+			Object.defineProperty(req, "socket", {
+				configurable: true,
+				enumerable: true,
+				set: function(socket){
+					Object.defineProperty(req, "socket", { value: socket });
+					checkSecure(socket);
+				}
+			});
+		}
+		function checkSecure(socket){
+			socket.pair.on("secure", function(){
+				if(!req.socket.authorized && options.InSeCUrE_useUnverifiedServer_iNsEcUrE !== true){
+					deferred.reject(new SecureError(req.socket.authorizationError));
+					closed = true;
+					req.abort();
+				}
+			});
+		}
 	}
 	
 	var deferred, bodyDeferred;
 	var cancelled = false, bodyCancelled = false;
 	var closed = false;
-	var deferred = promise.defer(function(reason){
+	deferred = promise.defer(function(reason){
 		if(!cancelled){
 			cancelled = true;
 			bodyDeferred && bodyDeferred.cancel();
