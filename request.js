@@ -268,12 +268,6 @@ function request(options){
 			deferred.reject(error);
 		}
 	});
-	req.on("close", function(){
-		if(!closed){
-			closed = true;
-			deferred.reject(new AbortError);
-		}
-	});
 	req.on("response", function(res){
 		if(cancelled){ return; }
 		
@@ -309,10 +303,14 @@ function request(options){
 			}
 		};
 		
+		var closed = false;
 		options.encoding && res.setEncoding(options.encoding);
 		res.on("data", function(chunk){ !cancelled && sendData(chunk); });
-		res.on("end", function(){ bodyDeferred.resolve(); });
-		res.on("close", function(){ bodyDeferred.reject(new AbortError); });
+		res.on("close", function(){
+			closed = true;
+			bodyDeferred.reject(new AbortError);
+		});
+		res.on("end", function(){ !closed && bodyDeferred.resolve(); });
 		deferred.resolve(response);
 	});
 	
